@@ -6,10 +6,10 @@ import {
     RemoveTodolistActionType,
     SetTodoListsActionType
 } from './todolists-reducer';
-import {TaskPriorities, TaskStatuses, TaskType, todoListsAPI} from '../api/todolists-api'
+import {TaskPriorities, TaskStatuses, TaskType, todoListsAPI, UpdateTaskModelType} from '../api/todolists-api'
 import {Dispatch} from "redux";
 import {HandleThunkActionCreator} from "react-redux";
-import {ThunkActionType} from "./store";
+import {AppRootStateType, ThunkActionType} from "./store";
 
 export type RemoveTaskActionType = {
     type: 'REMOVE-TASK',
@@ -180,15 +180,39 @@ export const removeTaskTC = (idTDL: string, idTSK: string) => (dispatch: Dispatc
             }
         })
 }
-export const addTaskTC = (titleTSK: string, idTDL: string): ThunkActionType =>
-    (dispatch) =>
-    {
+export const addTaskTC = (titleTSK: string, idTDL: string): ThunkActionType => (
+    dispatch
+) => {
     todoListsAPI.createTask(idTDL, titleTSK)
         .then(res => {
             if(res.data.resultCode === 0) {
                 dispatch(fetchingTasks(idTDL))
             }
         })
+}
+export const changeTaskStatusTC = (idTDL: string, idTSK: string, status: TaskStatuses): ThunkActionType => (
+    dispatch,
+    getState: () => AppRootStateType
+) => {
+    const currentTask  = getState().tasks[idTDL].find(tsk => tsk.id === idTSK)
+
+    if (currentTask) {
+        const model: UpdateTaskModelType = {
+            title: currentTask.title,
+            status,
+            deadline: currentTask.deadline,
+            description: currentTask.description,
+            priority: currentTask.priority,
+            startDate: currentTask.startDate
+        }
+        todoListsAPI.updateTask(idTDL, idTSK, model)
+            .then(res => {
+                if(res.data.resultCode === 0) {
+                    dispatch(fetchingTasks(idTDL))
+                }
+            })
+    }
+
 }
 
 export type SetTasksActionType = ReturnType<typeof setTasksAC>
