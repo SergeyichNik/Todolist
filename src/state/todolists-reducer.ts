@@ -1,6 +1,7 @@
 import { v1 } from 'uuid';
 import {todoListsAPI, TodolistType} from '../api/todolists-api'
 import {Dispatch} from "redux";
+import {ActionsType} from "./tasks-reducer";
 
 
 const initialState: Array<TodolistDomainType> = [
@@ -106,7 +107,3 @@ export type ChangeTodolistFilterActionType = {
     filter: FilterValuesType
 }
 
-type ActionsType = RemoveTodolistActionType | AddTodolistActionType
-    | ChangeTodolistTitleActionType
-    | ChangeTodolistFilterActionType
-    | SetTodoListsActionType
